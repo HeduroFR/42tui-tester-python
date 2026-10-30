@@ -241,8 +241,11 @@ and scripts; run them only in a trusted project or an isolated environment.
 The checkers cover file structure, style, selected forbidden operations and
 selected runtime behaviors, including factory and strategy behavior. If a
 constructor needs arguments the tester cannot infer, that behavior check is
-skipped and requires manual review. They do not cover every subject requirement, and
-mypy is not run by the bis checkers because both subjects include intentional
+skipped and requires manual review. They do not cover every subject requirement,
+and mypy is not run by the bis checkers because both subjects include intentional
 type errors. A passing report describes only the checks listed in it. Review the
-official subject and perform the peer evaluation as well. The JSON report option
-currently supports the two bis checkers only.
+official subject and perform the peer evaluation as well.
+
+For other modules and A-Maze-ing, JSON reports contain recorded failures and
+mark outcome accounting incomplete: the legacy checkers do not reliably record
+all passes or errors, so a clean run remains unverified.
