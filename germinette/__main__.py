@@ -1,6 +1,8 @@
 import sys
 import os
 import argparse
+import json
+from pathlib import Path
 import subprocess
 from rich.console import Console
 from rich.panel import Panel
@@ -75,6 +77,7 @@ def update_germinette():
 def main() -> None:
     parser = argparse.ArgumentParser(description="Germinette - 42 Python Testing Tool")
     parser.add_argument("module", nargs="?", help="Module to test (e.g., module_00)")
+    parser.add_argument("--report", help="Write a JSON report for supported bis checkers")
     parser.add_argument("--exercise", "-e", help="Specific exercise to test")
     parser.add_argument("--update", "-u", action="store_true", help="Update Germinette to the latest version")
     parser.add_argument("--verbose", action="store_true", help="Enable verbose / debug printing")
@@ -108,6 +111,11 @@ def main() -> None:
         console.print(f"\n[bold yellow]🔔 Update Available: v{remote_ver}[/bold yellow]")
         console.print("[dim]Run 'germinette --update' to get the latest features![/dim]\n")
 
+    report_path = Path(args.report).absolute() if args.report else None
+    if report_path and args.module not in {"python_module_05_bis", "python_module_06_bis"}:
+        parser.error("--report currently requires a bis module name")
+    if report_path:
+        report_path.unlink(missing_ok=True)
     runner = GerminetteRunner()
     run_outcome = None  # True = all exercises OK, False = failures, None = no test run
 
@@ -193,6 +201,10 @@ def main() -> None:
                 f"(offline?) · [bold]germinette -u[/bold] when online[/dim]"
             )
         
+        if report_path and getattr(runner, "last_tester", None) is not None:
+            report = runner.last_tester.report()
+            report_path.write_text(json.dumps(report, indent=2) + "\n", encoding="utf-8")
+
         # Exit with appropriate code
         if run_outcome is True:
             sys.exit(0)

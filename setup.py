@@ -20,6 +20,8 @@ setup(
     install_requires=[
         "rich",  # For pretty output
         "flake8", # Linter
+        "mypy",
+        "python-dotenv",
     ],
     extras_require={
         "dev": [

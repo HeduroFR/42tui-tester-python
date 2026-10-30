@@ -219,3 +219,30 @@ After each run, the CLI prints a **Disclaimer** panel, then a **version** line a
 <div align="center">
   <sub>Made with 🐍 and ☕ by <b>42 Heilbronn Students</b> 🇩🇪</sub>
 </div>
+
+## 42TUI bis subjects
+
+The `python_module_05_bis` and `python_module_06_bis` checkers target the
+version 1.0 subjects. Run them explicitly, for example:
+
+```sh
+germinette python_module_05_bis --report result.json
+germinette python_module_06_bis --report result.json
+```
+
+The report uses 42TUI's version 1 count fields and includes a `checks` array
+with individual names, statuses and diagnostic messages. A skipped check makes
+an otherwise successful run exit with status 2; failures exit with status 1.
+Install the package dependencies, including flake8, mypy and python-dotenv, in
+the tester environment. Module 05 bis creates temporary project copies for its
+virtual-environment and configuration probes. Other checks execute project code
+and scripts; run them only in a trusted project or an isolated environment.
+
+The checkers cover file structure, style, selected forbidden operations and
+selected runtime behaviors, including factory and strategy behavior. If a
+constructor needs arguments the tester cannot infer, that behavior check is
+skipped and requires manual review. They do not cover every subject requirement, and
+mypy is not run by the bis checkers because both subjects include intentional
+type errors. A passing report describes only the checks listed in it. Review the
+official subject and perform the peer evaluation as well. The JSON report option
+currently supports the two bis checkers only.

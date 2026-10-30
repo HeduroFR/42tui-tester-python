@@ -26,6 +26,8 @@ MODULE_VERSION_LABELS: dict[str, str] = {
     "python_module_09": "v.3.0",
     "python_module_10": "v.3.0",
     "a_maze_ing": "v.2.1",
+    "python_module_05_bis": "v.1.0",
+    "python_module_06_bis": "v.1.0",
 }
 
 
@@ -269,10 +271,21 @@ class GerminetteRunner:
             mod = importlib.import_module(f"germinette.subjects.{module_name}")
             tester = getattr(mod, "Tester")()
             tester.verbose = verbose
-            tester.run(exercise)
+            self.last_tester = tester
+            try:
+                tester.run(exercise)
+            except Exception as error:
+                if hasattr(tester, 'checks') and hasattr(tester, 'record'):
+                    tester.record('Tester execution', 'errors', str(error))
+                    return False
+                raise
             ge = getattr(tester, "grouped_errors", None)
             if isinstance(ge, dict):
-                return len(ge) == 0
+                if len(ge):
+                    return False
+                if hasattr(tester, "checks") and (not tester.checks or any(c["status"] == "skipped" for c in tester.checks)):
+                    return None
+                return True
             return False
         except ModuleNotFoundError:
             import difflib
