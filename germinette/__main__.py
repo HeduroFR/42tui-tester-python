@@ -77,7 +77,7 @@ def update_germinette():
 def main() -> None:
     parser = argparse.ArgumentParser(description="Germinette - 42 Python Testing Tool")
     parser.add_argument("module", nargs="?", help="Module to test (e.g., module_00)")
-    parser.add_argument("--report", help="Write a JSON report for supported bis checkers")
+    parser.add_argument("--report", help="Write a JSON report for a named checker")
     parser.add_argument("--exercise", "-e", help="Specific exercise to test")
     parser.add_argument("--update", "-u", action="store_true", help="Update Germinette to the latest version")
     parser.add_argument("--verbose", action="store_true", help="Enable verbose / debug printing")
@@ -112,8 +112,8 @@ def main() -> None:
         console.print("[dim]Run 'germinette --update' to get the latest features![/dim]\n")
 
     report_path = Path(args.report).absolute() if args.report else None
-    if report_path and args.module not in {"python_module_05_bis", "python_module_06_bis"}:
-        parser.error("--report currently requires a bis module name")
+    if report_path and (not args.module or args.module not in GerminetteRunner().list_modules() + ["a_maze_ing"]):
+        parser.error("--report requires an explicit supported checker name")
     if report_path:
         report_path.unlink(missing_ok=True)
     runner = GerminetteRunner()
@@ -148,7 +148,11 @@ def main() -> None:
         GerminetteRunner.cleanup_pycache()
         console.print()
 
-        if run_outcome is True:
+        incomplete_report = (report_path and getattr(runner, "last_tester", None) is not None
+                             and runner.last_tester.report().get("incomplete", False))
+        if run_outcome is True and incomplete_report:
+            console.print("[yellow]Check outcomes are incomplete; read the log.[/yellow]")
+        if run_outcome is True and not incomplete_report:
             console.print(
                 Panel.fit(
                     "[bold green]🎉 All exercises passed![/bold green]\n\n"

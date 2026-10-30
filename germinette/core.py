@@ -329,6 +329,17 @@ class BaseTester:
         self.grouped_errors[exercise_label].append(f"[bold]{error_type}[/bold]\n{message}")
         self.mark_ko()
 
+    def report(self):
+        # Legacy checkers do not reliably record successful or crashed checks.
+        findings = [{"name": label, "status": "failed"}
+                    for label, messages in self.grouped_errors.items()
+                    for _ in messages]
+        findings.append({"name": "Complete outcome accounting", "status": "skipped",
+                         "message": "Some check outcomes are not recorded; read the log."})
+        return {"version": 1, "total": len(findings), "passed": 0,
+                "failed": len(findings) - 1, "errors": 0, "skipped": 1,
+                "incomplete": True, "checks": findings}
+
     def mark_ok(self):
         self.ok_count = getattr(self, 'ok_count', 0) + 1
 
